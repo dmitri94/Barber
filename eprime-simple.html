@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ePrime - Рассчитайте мощность и экономию за 30 секунд</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1D1D1F;
+            background: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid #E5E5EA;
+            z-index: 1000;
+            padding: 16px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #007AFF;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: white;
+        }
+        
+        .hero-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .hero-proofs {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .proof-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .proof-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #FF9500;
+        }
+        
+        .proof-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .proof-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-height: 56px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007AFF, #0056CC);
+            color: white;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-hero {
+            font-size: 18px;
+            padding: 20px 40px;
+            min-height: 64px;
+        }
+        
+        /* Calculator Section */
+        .calculator {
+            padding: 80px 0;
+            background: #F2F2F7;
+        }
+        
+        .calculator-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .calculator-header {
+            background: #007AFF;
+            color: white;
+            padding: 32px;
+            text-align: center;
+        }
+        
+        .calculator-header h2 {
+            margin-bottom: 24px;
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #FF9500;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 25%;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .calc-step {
+            display: none;
+            padding: 40px;
+        }
+        
+        .calc-step.active {
+            display: block;
+        }
+        
+        .calc-step h3 {
+            text-align: center;
+            margin-bottom: 32px;
+            color: #1D1D1F;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .option-card {
+            background: #F2F2F7;
+            border: 2px solid #E5E5EA;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-card:hover {
+            border-color: #007AFF;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .option-card.selected {
+            border-color: #007AFF;
+            background: #007AFF;
+            color: white;
+        }
+        
+        .option-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .option-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .option-desc {
+            font-size: 14px;
+            color: #6E6E73;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-proofs {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calc-step {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span>⚡</span>
+                <span>ePrime</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Рассчитайте мощность и экономию за 30 секунд — получите бесплатный 3D-проект
+                </h1>
+                <p class="hero-subtitle">
+                    Персональный расчет солнечной станции для вашего дома или бизнеса
+                </p>
+                
+                <div class="hero-proofs">
+                    <div class="proof-item">
+                        <span class="proof-number">680+</span>
+                        <span class="proof-text">проектов</span>
+                    </div>
+                    <div class="proof-item">
+                        <span class="proof-badge">Tier-1</span>
+                    </div>
+                    <div class="proof-item">
+                        <span class="proof-badge">TÜV/IEC/ISO</span>
+                    </div>
+                    <div class="proof-item">
+                        <span class="proof-badge">Рассрочка 0%</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-hero" onclick="startCalculator()">
+                    Начать расчёт
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator Section -->
+    <section class="calculator" id="calculator">
+        <div class="container">
+            <div class="calculator-wrapper">
+                <div class="calculator-header">
+                    <h2>Калькулятор солнечной станции</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Шаг 1 из 4</div>
+                </div>
+
+                <!-- Step 1: Who are you -->
+                <div class="calc-step active" id="step1">
+                    <h3>Кто вы?</h3>
+                    <div class="options-grid">
+                        <button class="option-card" onclick="selectOption('type', 'home')">
+                            <div class="option-icon">🏠</div>
+                            <div class="option-title">Дом</div>
+                            <div class="option-desc">Частное домовладение</div>
+                        </button>
+                        <button class="option-card" onclick="selectOption('type', 'business')">
+                            <div class="option-icon">🏢</div>
+                            <div class="option-title">Бизнес</div>
+                            <div class="option-desc">Коммерческий объект</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Electricity bill -->
+                <div class="calc-step" id="step2">
+                    <h3>Ваш счет за электричество</h3>
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <p>Введите ваш ежемесячный счет за электричество:</p>
+                        <input type="number" id="billAmount" placeholder="Например: 1500 MDL" 
+                               style="padding: 16px; border: 2px solid #E5E5EA; border-radius: 8px; font-size: 16px; width: 100%; max-width: 300px; margin: 16px 0;">
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                            <button class="btn btn-primary" onclick="nextStep()" style="margin-left: 16px;">Продолжить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Object conditions -->
+                <div class="calc-step" id="step3">
+                    <h3>Условия объекта</h3>
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <p>Выберите тип крыши:</p>
+                        <select id="roofType" style="padding: 16px; border: 2px solid #E5E5EA; border-radius: 8px; font-size: 16px; width: 100%; max-width: 300px; margin: 16px 0;">
+                            <option value="pitched">Скатная</option>
+                            <option value="flat">Плоская</option>
+                            <option value="unknown">Не знаю</option>
+                        </select>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                            <button class="btn btn-primary" onclick="nextStep()" style="margin-left: 16px;">Продолжить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Options -->
+                <div class="calc-step" id="step4">
+                    <h3>Дополнительные опции</h3>
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <p>Выберите предпочитаемый мессенджер:</p>
+                        <select id="messenger" style="padding: 16px; border: 2px solid #E5E5EA; border-radius: 8px; font-size: 16px; width: 100%; max-width: 300px; margin: 16px 0;">
+                            <option value="whatsapp">WhatsApp</option>
+                            <option value="telegram">Telegram</option>
+                            <option value="viber">Viber</option>
+                        </select>
+                        <div style="margin-top: 16px;">
+                            <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                            <button class="btn btn-primary" onclick="calculateResult()" style="margin-left: 16px;">Рассчитать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results" id="results" style="display: none; padding: 80px 0; background: white;">
+        <div class="container">
+            <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <h2 style="margin-bottom: 48px; color: #1D1D1F;">Ваш предварительный результат</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 48px;">
+                    <div style="background: #F2F2F7; padding: 32px 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⚡</div>
+                        <div style="font-size: 16px; color: #6E6E73; margin-bottom: 12px;">Рекомендуемая мощность</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #007AFF;" id="powerResult">5-8 кВт</div>
+                    </div>
+                    <div style="background: #F2F2F7; padding: 32px 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">💰</div>
+                        <div style="font-size: 16px; color: #6E6E73; margin-bottom: 12px;">Экономия в год</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #007AFF;" id="savingsResult">12,000-18,000 MDL</div>
+                    </div>
+                    <div style="background: #F2F2F7; padding: 32px 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">💵</div>
+                        <div style="font-size: 16px; color: #6E6E73; margin-bottom: 12px;">Стоимость станции</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #007AFF;" id="priceResult">45,000-65,000 MDL</div>
+                    </div>
+                    <div style="background: #F2F2F7; padding: 32px 24px; border-radius: 12px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">📈</div>
+                        <div style="font-size: 16px; color: #6E6E73; margin-bottom: 12px;">Окупаемость</div>
+                        <div style="font-size: 24px; font-weight: 700; color: #007AFF;" id="paybackResult">3-5 лет</div>
+                    </div>
+                </div>
+
+                <div style="background: #F2F2F7; padding: 48px; border-radius: 12px; margin-top: 48px;">
+                    <h3 style="margin-bottom: 32px; color: #1D1D1F;">Почти готово! Куда отправить персональный 3D-проект и детальную смету?</h3>
+                    
+                    <form style="max-width: 600px; margin: 0 auto;">
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1D1D1F;">Телефон *</label>
+                            <input type="tel" placeholder="+373" required 
+                                   style="width: 100%; padding: 16px; border: 2px solid #E5E5EA; border-radius: 8px; font-size: 16px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1D1D1F;">Имя (необязательно)</label>
+                            <input type="text" placeholder="Ваше имя" 
+                                   style="width: 100%; padding: 16px; border: 2px solid #E5E5EA; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">
+                            Получить 3D-проект и смету
+                        </button>
+                        
+                        <div style="margin-top: 16px; font-size: 14px; color: #6E6E73;">
+                            <span>✅</span>
+                            Бесплатно • 24 часа • Без спама
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Global variables
+        let currentStep = 1;
+        let totalSteps = 4;
+        let calculatorData = {
+            type: null,
+            billAmount: null,
+            roofType: null,
+            messenger: 'whatsapp'
+        };
+
+        // Initialize calculator when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+        });
+
+        // Start calculator from hero section
+        function startCalculator() {
+            document.getElementById('calculator').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Select option (for step 1)
+        function selectOption(field, value) {
+            calculatorData[field] = value;
+            
+            // Update UI to show selection
+            const optionCards = document.querySelectorAll('.option-card');
+            optionCards.forEach(card => card.classList.remove('selected'));
+            
+            // Find and select the clicked card
+            const clickedCard = event.currentTarget;
+            clickedCard.classList.add('selected');
+            
+            // Auto-advance to next step after a short delay
+            setTimeout(() => {
+                nextStep();
+            }, 500);
+        }
+
+        // Go to next step
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        // Go to previous step
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        // Show specific step
+        function showStep(stepNumber) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            
+            // Show current step
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Update progress
+            currentStep = stepNumber;
+            updateProgress();
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            const progress = (currentStep / totalSteps) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `Шаг ${currentStep} из ${totalSteps}`;
+        }
+
+        // Calculate results
+        function calculateResult() {
+            // Get values
+            calculatorData.billAmount = document.getElementById('billAmount').value;
+            calculatorData.roofType = document.getElementById('roofType').value;
+            calculatorData.messenger = document.getElementById('messenger').value;
+            
+            // Perform calculations
+            const results = performCalculations();
+            
+            // Display results
+            displayResults(results);
+            
+            // Show results section
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Perform calculations
+        function performCalculations() {
+            let power = 5; // Default value
+            
+            // Calculate power based on electricity bill
+            if (calculatorData.billAmount) {
+                const estimatedKwh = calculatorData.billAmount * 0.5;
+                power = Math.max(3, Math.min(10, estimatedKwh / 30));
+            }
+            
+            // Adjust power based on object type
+            if (calculatorData.type === 'business') {
+                power *= 1.5;
+            }
+            
+            // Calculate savings and price
+            const monthlyKwh = power * 120;
+            const electricityRate = 2.5;
+            const savings = monthlyKwh * electricityRate * 12;
+            const price = power * 8000;
+            const payback = price / savings;
+            
+            return {
+                power: power.toFixed(1),
+                savings: Math.round(savings),
+                price: Math.round(price),
+                payback: payback.toFixed(1)
+            };
+        }
+
+        // Display calculation results
+        function displayResults(results) {
+            document.getElementById('powerResult').textContent = `${results.power} кВт`;
+            document.getElementById('savingsResult').textContent = `${results.savings.toLocaleString()} MDL`;
+            document.getElementById('priceResult').textContent = `${results.price.toLocaleString()} MDL`;
+            document.getElementById('paybackResult').textContent = `${results.payback} лет`;
+        }
+    </script>
+</body>
+</html>
